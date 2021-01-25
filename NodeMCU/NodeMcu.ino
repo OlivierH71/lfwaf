@@ -3,10 +3,6 @@
  
 */
 
-# include <EEPROM.h>
-
-EEPROM memory;
-
 #define btnW_L_pin  D0
 #define btnW_R_pin  D1
 #define btnF_L_pin  D7
