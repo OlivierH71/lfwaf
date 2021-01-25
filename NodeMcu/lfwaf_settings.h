@@ -24,7 +24,7 @@
 #ifndef lfwaf_settings_h
 #define lfwaf_settings_h
 
-#include "EEPROM.h"
+#include <EEPROM.h>
 
 class lfwaf_settings{
   struct _values {
@@ -43,14 +43,13 @@ class lfwaf_settings{
 	  int  focuserSpeed;
   };
   private:
-	EEPROM *memory;
   
   public:
     bool isvalid;
-	_values values;
+	  _values values;
     lfwaf_settings();
     bool load();
-    bool save();
+    void save();
 };
 
 #endif

@@ -8,19 +8,18 @@
 
 lfwaf_settings::lfwaf_settings()
 {
-    memory = new(EEPROM);
     isvalid = load();
 }
 
 bool lfwaf_settings::load()
 {
-    values = memory.get(0);
-    isValid = !strncmp(values, "lfwafSet" + char[0], 9);
+    EEPROM.get(0, values);
+    bool isValid = !strncmp(values.key, "lfwafSet", 8);
     return isValid;
 }
 
 void lfwaf_settings::save()
 {
-  setmem(values.key, "lfwafSet" + char[0]);
-  memory.put(0, values);
+  strcpy("lfwafSet", values.key);
+  EEPROM.put(0, values);
 }
