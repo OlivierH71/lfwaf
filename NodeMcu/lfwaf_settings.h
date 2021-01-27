@@ -1,26 +1,20 @@
 /*
  *  Settings CLASS FOR LFAWF
- *  
+ *
  *  Created By Deneb-l (olivier.hennebelle@gmail.com)
  *
  *  ¿How to use?
- *  
+ *
  *  1 - Declare Settings type var after setup() [lfawf_settings* settings]
  *  2 - Instantiate new Settings in var created before [settings = new lfawf_settings()]
  * 		--> new var will load settings from EEPROM
  *  3 - Use predefined public methods [lfwaf_settings->method()]
  *
  *  Public Methods
- *  
- *  setPins((int) step, (int) enable, (int) reset)
- *  setDirection((bool) direction) [0 Forward, 1 Reverse]
- *  setSpeed((int) speed) [Min 0, Max 255]
- *  toggleDirection()
- *  run()
- *  stop()
- *  
+ *
+ *
  */
- 
+
 #ifndef lfwaf_settings_h
 #define lfwaf_settings_h
 
@@ -43,7 +37,7 @@ class lfwaf_settings{
 	  int  focuserSpeed;
   };
   private:
-  
+
   public:
     bool isvalid;
 	  _values values;
