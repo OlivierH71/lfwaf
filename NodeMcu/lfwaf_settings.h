@@ -19,29 +19,36 @@
 #define lfwaf_settings_h
 
 #include <EEPROM.h>
+// #include "lfwaf_logger.h"
 
+enum wifi_preference { wifi_pref_stronger, wifi_pref_wifi1, wifi_pref_wifi2};
+
+class lfwaf_logger;
 class lfwaf_settings{
-  struct _values {
+  struct Svalues {
 	  char key[9]; // = "lfwafSet" + char[0]
 	  // Wifi settings
-	  char wifi1_ssid[33];
-	  char wifi1_pass[33];
-	  char wifi2_ssid[33];
-	  char wifi3_pass[33];
+	  char wifi_ssid[2][33];
+	  char wifi_pass[2][33];
 	  byte wifi_preference;	// 0: takes the one with the best signal, 1: wifi1, then wifi2, 2: wifi2 then wifi1
 	  // FilterWheel Settings
-	  byte currentFilter;
+    char FilterNames[10][33];
+	  byte FilterNum;
 	  byte fwSpeed;
 	  // focuser Settings
 	  byte  focuserPos;
 	  int  focuserSpeed;
   };
   private:
-
+    lfwaf_logger *_log;
+    void setWifi(int n, char* ssid, char* pwd);
+    void setFilterNum(byte Filter);
+    void setFilterName(int n, char *name);
+    void setFilterNames(int n, char **name);
   public:
     bool isvalid;
-	  _values values;
-    lfwaf_settings();
+	  Svalues values;
+    lfwaf_settings(lfwaf_logger *logger);
     bool load();
     void save();
 };

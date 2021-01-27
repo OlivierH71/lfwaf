@@ -12,19 +12,23 @@
 #include "lfwaf_logger.h"
 #include "lfwaf_wifi.h"
 
+enum logLevel { debug, info, warning, error };
+
+class lfwaf_wifi;
 class lfwaf_logger{
 private:
   //const char *levelS[] = { "debug", "info",  "warning", "error"};
-  _buffer[1024]; // most efficient way so we don't allocate/deallocate memory for message concat
-  lfwaf_wifi _wifi;
+  char _buffer[1024]; // having a static buffer is the most efficient way so we don't allocate/deallocate memory for message concat
+  lfwaf_wifi *_wifi;
 public:
   bool isDebug;
   bool hasWifi = false;
 
-  enum level { debug, info, warning, error };
   lfwaf_logger(bool withDebug);
-  void log(level lvl, String msg);
-}
+  void log(logLevel lvl, String msg);
+  void setWifi(lfwaf_wifi *_newWifi);
+  void unsetWifi();
+};
 
 
 #endif

@@ -3,18 +3,20 @@
  
 */
 
+#include "lfwaf_logger.h"
 #include "lfwaf_settings.h"
 #include "lfwaf_wifi.h"
+#include "lfwaf_helpers.h"
 
-#define btnW_L_pin  D0
-#define btnW_R_pin  D1
-#define btnF_L_pin  D7
-#define btnF_R_pin  D5
+#define btnW_L_pin  D4
+#define btnW_R_pin  D5
+#define btnF_L_pin  D6
+#define btnF_R_pin  D7
 
-#define motW_L_pin  D2
-#define motW_R_pin  D3
-#define motF_L_pin  D4
-#define motF_R_pin  D8
+#define motW_L_pin  D0
+#define motW_R_pin  D1
+#define motF_L_pin  D2
+#define motF_R_pin  D3
 
 #define motorMinValue 135
 #define motorMaxValue 1023
