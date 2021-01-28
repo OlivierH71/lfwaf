@@ -29,11 +29,12 @@ int cnvSpeed(int speed20){
 int speedW=cnvSpeed(10);
 int speedF=cnvSpeed(10);
 
+lfwaf_logger _log(true);
+
+
 void setup() {
-  //start serial connection
-  Serial.begin(115200);
-  delay(10);
-  Serial.println("lfwaf is starting");
+  // Create logger
+  _log.log("lfwaf is starting");
 
   Serial.println("setting pins");
   //configure pin 2 as an input and enable the internal pull-up resistor
