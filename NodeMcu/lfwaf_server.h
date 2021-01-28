@@ -10,6 +10,8 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include "lfwaf_logger.h"
+#include "lfwaf_settings.h"
 ////////////////////////////////////////////////////////////
 
 //how many clients should be able to telnet to lwfaf? (one for indi and two for extern control)
@@ -17,9 +19,9 @@
 //#define TCP_PORT 23
 
 class lfwaf_server {
-  WiFiServer server(23); // TCP_PORT);
+   // TCP_PORT);
 private:
-
+  WiFiServer server;
   WiFiClient serverClients[MAX_SRV_CLIENTS];
   char clientMsgs[MAX_SRV_CLIENTS][64];
   byte clientMsgsIdx[MAX_SRV_CLIENTS];

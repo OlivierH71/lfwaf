@@ -5,15 +5,19 @@
  *
 */
 
-#include "lfwaf_server.h"
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include "lfwaf_logger.h"
+#include "lfwaf_settings.h"
+#include "lfwaf_server.h"
 
 lfwaf_server::lfwaf_server(lfwaf_logger *log, lfwaf_settings *settings){
   _log = log;
   _settings = settings;
   //start server
+  server = WiFiServer(23);
   server.begin();
   // IMPORTANT: Avoid Nagle, ie, wait for enough data to transmit packet. We need immediate communication
   server.setNoDelay(true);
