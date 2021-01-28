@@ -26,13 +26,14 @@ void lfwaf_logger::log(logLevel lvl, String msg){
     sprintf(buf1, "%f",  myTime / 1000);
     sprintf(_buffer,"%d:%s:%s\n", lvl, buf1, msg.c_str());
     if (hasWifi){
+      _server->announce(_buffer);
       // _wifiClient.say(_buffer);
     }
   }
 }
 
-void lfwaf_logger::setWifi(lfwaf_wifi *_newWifi){
-    _wifi = _newWifi;
+void lfwaf_logger::setWifi(lfwaf_server *_newServer){
+    _server = _newServer;
     hasWifi = true;
 }
 
