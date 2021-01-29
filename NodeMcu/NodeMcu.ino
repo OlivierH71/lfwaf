@@ -30,13 +30,15 @@ int speedW=cnvSpeed(10);
 int speedF=cnvSpeed(10);
 
 lfwaf_logger _log(true);
+lfwaf_settings _settings(&_log);
 
+void ICACHE_RAM_ATTR btnW_L_ISR(){ processBtn(btnW_L,_settings->values) }
 
 void setup() {
   // Create logger
-  _log.log("lfwaf is starting");
+  _log.log(info, "lfwaf is starting");
+  _log.log(debug, "setting pins");
 
-  Serial.println("setting pins");
   //configure pin 2 as an input and enable the internal pull-up resistor
   pinMode(btnW_L_pin, INPUT);
   pinMode(btnW_R_pin, INPUT);
@@ -46,9 +48,14 @@ void setup() {
   pinMode(motW_L_pin, OUTPUT);
   pinMode(motW_L_pin, OUTPUT);
   pinMode(motW_L_pin, OUTPUT);
-  Serial.println();
   //Change frequency for PWM functions
   analogWriteFreq(50);
+
+   // Set an interupt for each button
+  attachInterrupt(digitalPinToInterrupt(btnW_L_pin),btnW_L_ISR,CHANGE);
+  attachInterrupt(digitalPinToInterrupt(btnW_R_pin),btnW_R_ISR,CHANGE);
+  attachInterrupt(digitalPinToInterrupt(btnF_L_pin),btnF_L_ISR,CHANGE);
+  attachInterrupt(digitalPinToInterrupt(btnF_R_pin),btnF_R_ISR,CHANGE);
   
 }
 

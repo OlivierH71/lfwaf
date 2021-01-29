@@ -37,7 +37,7 @@ class lfwaf_settings{
 	  byte fwSpeed;
 	  // focuser Settings
 	  byte  focuserPos;
-	  int  focuserSpeed;
+	  byte  focuserSpeed;
   };
   private:
     lfwaf_logger *_log;
