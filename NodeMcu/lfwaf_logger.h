@@ -3,7 +3,6 @@
  *
  *  Created By Deneb-l (olivier.hennebelle@gmail.com)
  *
- *
  */
 
 #ifndef lfwaf_logger_h

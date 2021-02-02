@@ -28,11 +28,37 @@ int cnvSpeed(int speed20){
 
 int speedW=cnvSpeed(10);
 int speedF=cnvSpeed(10);
+int wheelMove = 0;
 
 lfwaf_logger _log(true);
 lfwaf_settings _settings(&_log);
 
-void ICACHE_RAM_ATTR btnW_L_ISR(){ processBtn(btnW_L,_settings->values) }
+// Aftr an interrupt, we process what happened exactly
+void processBtn( int btn, int Speed){
+  //bool starting = false;
+  // btnPressed
+  if (digitalRead(btn) == LOW)
+    //starting = true;
+    switch(btn){
+      case btnW_L_pin: WheelMove--; break;
+      case btnW_R_pin: WheelMove++; break;
+      case btnF_L_pin: analogWrite(motW_L_pin, cnvSpeed(_settings->values.focuserSpeed));break;
+      case btnF_L_pin: analogWrite(motW_R_pin, cnvSpeed(_settings->values.focuserSpeed));break;
+    }
+   else
+    switch(btn){
+//      case btnW_L_pin: WheelMove--; break;  // nothing
+//      case btnW_R_pin: WheelMove++; break;  // nothing
+      case btnF_L_pin: analogWrite(motW_L_pin, 0);break;
+      case btnF_L_pin: analogWrite(motW_R_pin, 0);break;
+    }
+}
+
+// Handler for onboard buttons. We set one interrupt per button
+void ICACHE_RAM_ATTR btnW_L_ISR(){ processBtn(btnW_L,_settings->values.fwSpeed); }
+void ICACHE_RAM_ATTR btnW_L_ISR(){ processBtn(btnW_R,_settings->values.fwSpeed); }
+void ICACHE_RAM_ATTR btnW_L_ISR(){ processBtn(btnF_L,_settings->values.focuserSpeed); }
+void ICACHE_RAM_ATTR btnW_L_ISR(){ processBtn(btnF_R,_settings->values.focuserSpeed); }
 
 void setup() {
   // Create logger

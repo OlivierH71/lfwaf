@@ -1,7 +1,7 @@
 #include <LiquidCrystal.h>
 
 /*
-  lfwaf_wifi.cpp - Library for managinf lfwaf wifi
+  lfwaf_logger.cpp - Library for managinf lfwaf wifi
   see lfwaf_wifi.h
 */
 
@@ -9,6 +9,8 @@
 #include "lfwaf_logger.h"
 #include "lfwaf_wifi.h"
 #include <ESP8266WiFi.h>
+
+// Class constructor: setup serial connection for logging
 
 lfwaf_logger::lfwaf_logger(bool withDebug){
     isDebug = withDebug;
@@ -18,6 +20,7 @@ lfwaf_logger::lfwaf_logger(bool withDebug){
     this->log(info,"lwaf_logger started.");
 }
 
+// most important function of this class: log a message
 void lfwaf_logger::log(logLevel lvl, String msg){
   if (isDebug || lvl != debug){
     char buf1[20];
@@ -27,16 +30,17 @@ void lfwaf_logger::log(logLevel lvl, String msg){
     sprintf(_buffer,"%d:%s:%s\n", lvl, buf1, msg.c_str());
     if (hasWifi){
       _server->announce(_buffer);
-      // _wifiClient.say(_buffer);
     }
   }
 }
 
+// set the wifi stream
 void lfwaf_logger::setWifi(lfwaf_server *_newServer){
     _server = _newServer;
     hasWifi = true;
 }
 
+// stop logging to wifi
 void lfwaf_logger::unsetWifi(){
   hasWifi = false;
 }

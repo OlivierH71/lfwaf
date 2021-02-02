@@ -120,6 +120,7 @@ void lfwaf_server::processInputs(){
     }
 }
 
+// Most important method of class: sends a message to all clients
 void lfwaf_server::announce(char *message){
   int lenmsg = strlen(message);
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)

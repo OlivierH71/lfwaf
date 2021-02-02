@@ -34,10 +34,10 @@ class lfwaf_settings{
 	  // FilterWheel Settings
     char FilterNames[10][33];
 	  byte FilterNum;
-	  byte fwSpeed;
+	  int fwSpeed;
 	  // focuser Settings
 	  byte  focuserPos;
-	  byte  focuserSpeed;
+	  byte  focuserSpeed; // From 1 to 20...
   };
   private:
     lfwaf_logger *_log;
