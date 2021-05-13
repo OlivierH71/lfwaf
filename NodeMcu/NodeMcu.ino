@@ -40,8 +40,8 @@ void processBtn( int btn, int Speed){
   if (digitalRead(btn) == LOW)
     //starting = true;
     switch(btn){
-      case btnW_L_pin: WheelMove--; break;
-      case btnW_R_pin: WheelMove++; break;
+      case btnW_L_pin: wheelMove--; break;
+      case btnW_R_pin: wheelMove++; break;
       case btnF_L_pin: analogWrite(motW_L_pin, cnvSpeed(_settings->values.focuserSpeed));break;
       case btnF_L_pin: analogWrite(motW_R_pin, cnvSpeed(_settings->values.focuserSpeed));break;
     }
