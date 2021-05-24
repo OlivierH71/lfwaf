@@ -31,6 +31,8 @@ void lfwaf_logger::log(logLevel lvl, String msg){
     if (hasWifi){
       _server->announce(_buffer);
     }
+    else
+      Serial.print(String(_buffer));
   }
 }
 

@@ -4,10 +4,6 @@
  *  Created By Deneb-l (olivier.hennebelle@gmail.com)
  *
 */
-
-
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
 #include <WiFiClient.h>
 #include "lfwaf_logger.h"
 #include "lfwaf_settings.h"
@@ -19,9 +15,10 @@ lfwaf_server::lfwaf_server(lfwaf_logger *log, lfwaf_settings *settings) : server
   _settings = settings;
   //start server
   //WiFiServer server(23);
-  server.begin();
+  _log->log(info,"Starting Wifi Server");
+  WiFi.begin();//"theNewOufBox","");
   // IMPORTANT: Avoid Nagle, ie, wait for enough data to transmit packet. We need immediate communication
-  server.setNoDelay(true);
+    server.setNoDelay(true);
   _log->log(info,"Ready! Use 'telnet' to connect");
   _log->setWifi(this);
 }

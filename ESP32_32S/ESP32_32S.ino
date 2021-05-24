@@ -5,6 +5,8 @@
 #include "lfwaf_settings.h"
 #include "lfwaf_wifi.h"
 #include "lfwaf_helpers.h"
+#include "cntBtn.h"
+#include "HW-354.h"
 
 /*************************************************************
   Manual Buttons Definitions
@@ -13,6 +15,11 @@
 #define btnW_R_pin  21
 #define btnF_L_pin  22
 #define btnF_R_pin  23
+#define btnEOC_up_pin 5
+#define btnEOC_dn_pin 18
+
+
+cntBtn *btnW_L,*btnW_R, *btnF_L, *btnF_R, *btnEOC_up, *btnEOC_dn;
 
 /*************************************************************
   Motor Definitions
@@ -22,7 +29,7 @@
 #define motF_L_pin  32
 #define motF_R_pin  33
 
-#define motorMinValue 34
+#define motorMinValue 255
 #define motorMaxValue 255
 
 #define CHANNEL_W 0
@@ -31,68 +38,93 @@
 HW354 motorWheel(motW_L_pin, motW_R_pin, CHANNEL_W);
 HW354 motorFocus(motF_L_pin, motF_R_pin, CHANNEL_F);
 
-/*************************************************************
-                          Helpers
-*************************************************************/
 int speedW = motorMinValue;
 int speedF = motorMinValue;
 int wheelMove = 0;
 
 lfwaf_logger _log(true);
 lfwaf_settings _settings(&_log);
+lfwaf_wifi _wifi(&_log, &_settings);
+lfwaf_server _server(&_log, &_settings);
 
-// After an interrupt, we process what happened exactly
-void processBtn( int btn, int Speed){
-  //bool starting = false;
-  // btnPressed
-  if (digitalRead(btn) == LOW)
-    //starting = true;
-    switch(btn){
-      case btnW_L_pin: wheelMove--; break;
-      case btnW_R_pin: wheelMove++; break;
-      case btnF_L_pin: analogWrite(motW_L_pin, cnvSpeed(_settings->values.focuserSpeed));break;
-      case btnF_L_pin: analogWrite(motW_R_pin, cnvSpeed(_settings->values.focuserSpeed));break;
+/*************************************************************
+                          Methods
+*************************************************************/
+void focuserMove(boolean toUp){
+  if (toUp){
+    if (digitalRead(btnEOC_up_pin)){
+      _log.log(info, "Moving focuser up");
+        motorFocus.startMotor(speedW);
+      }
+      else
+      _log.log(info, "Cannot move focuser up, End of Course reached");
     }
-   else
-    switch(btn){
-//      case btnW_L_pin: WheelMove--; break;  // nothing
-//      case btnW_R_pin: WheelMove++; break;  // nothing
-      case btnF_L_pin: analogWrite(motW_L_pin, 0);break;
-      case btnF_L_pin: analogWrite(motW_R_pin, 0);break;
+    else {
+      if (digitalRead(btnEOC_dn_pin)){
+      _log.log(info, "Moving focuser down");
+        motorFocus.startMotor(-speedW);
+        }
+      else
+      _log.log(info, "Cannot move focuser down, End of Course is reached");
     }
 }
 
-// Handler for onboard buttons. We set one interrupt per button
-void ICACHE_RAM_ATTR btnW_L_ISR(){ processBtn(btnW_L,_settings->values.fwSpeed); }
-void ICACHE_RAM_ATTR btnW_L_ISR(){ processBtn(btnW_R,_settings->values.fwSpeed); }
-void ICACHE_RAM_ATTR btnW_L_ISR(){ processBtn(btnF_L,_settings->values.focuserSpeed); }
-void ICACHE_RAM_ATTR btnW_L_ISR(){ processBtn(btnF_R,_settings->values.focuserSpeed); }
+// Handler for buttonPressed
+void btnPressedHandler(cntBtn *btn){
+  // Several cases:
+  switch(btn->PIN){
+    // End of course for focuser
+    case btnEOC_up_pin: motorFocus.stopMotor();break;
+    case btnEOC_dn_pin: motorFocus.stopMotor();break;
+    // FilterWheel -
+    case btnW_L_pin: wheelMove--; break;
+    // FilterWheel +
+    case btnW_R_pin: wheelMove++; break;
+    // Move focuser up
+    case btnF_L_pin: focuserMove(true);break;
+    // Move focuser down
+    case btnF_R_pin: focuserMove(false);break;
+  }
+}
+
+// Handler for buttonReleased
+void btnReleasedHandler(cntBtn *btn){
+  _log.log(info,"Stopping focuser");
+  motorFocus.stopMotor();
+  /* switch(btn->PIN){
+    case btnF_L_pin:  moto motorFocus.stopMotor();break;
+    // Move focuser down
+    case btnF_R_pin: motorFocus.stopMotor();break;
+  } */
+}
 
 /*************************************************************
                         ARDUINO SETUP
 *************************************************************/
 void setup() {
   // Create logger
+  _log = new lfwaf_logger(true);
   _log.log(info, "lfwaf is starting");
-  _log.log(debug, "setting pins");
+  _log.log(debug, "Setting buttons");
 
-  //configure pin 2 as an input and enable the internal pull-up resistor
-  pinMode(btnW_L_pin, INPUT);
-  pinMode(btnW_R_pin, INPUT);
-  pinMode(btnF_L_pin, INPUT);
-  pinMode(btnF_R_pin, INPUT);
-  pinMode(motW_L_pin, OUTPUT);
-  pinMode(motW_L_pin, OUTPUT);
-  pinMode(motW_L_pin, OUTPUT);
-  pinMode(motW_L_pin, OUTPUT);
-  //Change frequency for PWM functions
-  analogWriteFreq(50);
+  // Create Buttons instances
+  btnW_L = new cntBtn(btnW_L_pin);
+  btnW_R = new cntBtn(btnW_R_pin);
+  btnF_L = new cntBtn(btnF_L_pin);
+  btnF_R = new cntBtn(btnF_R_pin);
+  btnEOC_up = new cntBtn(btnEOC_up_pin);
+  btnEOC_dn = new cntBtn(btnEOC_dn_pin);
 
-   // Set an interupt for each button
-  attachInterrupt(digitalPinToInterrupt(btnW_L_pin),btnW_L_ISR,CHANGE);
-  attachInterrupt(digitalPinToInterrupt(btnW_R_pin),btnW_R_ISR,CHANGE);
-  attachInterrupt(digitalPinToInterrupt(btnF_L_pin),btnF_L_ISR,CHANGE);
-  attachInterrupt(digitalPinToInterrupt(btnF_R_pin),btnF_R_ISR,CHANGE);
+  // Set interupt handlers for each button
+  btnW_L->setOnPressed(btnPressedHandler);
+  btnW_R->setOnPressed(btnPressedHandler);
+  btnF_L->setOnPressed(btnPressedHandler);
+  btnF_R->setOnPressed(btnPressedHandler);
+  btnEOC_up->setOnPressed(btnPressedHandler);
+  btnEOC_dn->setOnPressed(btnPressedHandler);
+
+  btnF_L->setOnReleased(btnReleasedHandler);
+  btnF_R->setOnReleased(btnReleasedHandler);
 
 }
 
@@ -100,17 +132,8 @@ void setup() {
                         ARDUINO LOOP
 *************************************************************/
 void loop() {
-  //read the pushbutton value into a variable
-  if (digitalRead(btnW_L_pin) == LOW){
-    analogWrite(motW_L_pin,135);
-  } else {
-    analogWrite(motW_L_pin,0);
-  }
-  if (digitalRead(btnW_R_pin) == LOW){
-    digitalWrite(LED_BUILTIN, LOW);
-    analogWrite(motW_R_pin,1023);
-  } else {
-    digitalWrite(LED_BUILTIN, HIGH);
-    analogWrite(motW_R_pin,0);
-  }
+  // Button actions are directly managed by interrupt
+  // motors impulsions are driven by PWM
+  
+
 }

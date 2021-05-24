@@ -7,9 +7,8 @@
 #ifndef lfwaf_server_h
 #define lfwaf_server_h
 
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
 #include <WiFiClient.h>
+#include <WiFi.h>
 #include "lfwaf_logger.h"
 #include "lfwaf_settings.h"
 ////////////////////////////////////////////////////////////

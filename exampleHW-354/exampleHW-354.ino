@@ -2,7 +2,6 @@
  * Drives a DC Motor using a HW-354 (MX1508) from an ESP32
  * Motor can run one way or reverse using 2 PINS
  * Works with GPIO2,4,12,13,14,15,25,26,27,32,33
- * 
 */
 #include "HW-354.h"
 

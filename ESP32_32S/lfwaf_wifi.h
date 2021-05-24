@@ -17,7 +17,6 @@ private:
   lfwaf_logger *_log;
   lfwaf_settings *_settings;
 public:
-
   lfwaf_wifi(lfwaf_logger *log, lfwaf_settings *settings);
   bool connected;
   String activeSSID;
