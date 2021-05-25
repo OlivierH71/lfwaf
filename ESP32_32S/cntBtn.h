@@ -21,7 +21,7 @@ void setup() {
 #include "Arduino.h"
 
 class cntBtn {
-  typedef void (*callback_t)(cntBtn *btn);
+  typedef void (*callback_t)(cntBtn *btn, void *parent);
   public:
     cntBtn(uint8_t pin);
     ~cntBtn();

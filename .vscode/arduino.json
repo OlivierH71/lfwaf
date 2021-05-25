@@ -1,0 +1,5 @@
+{
+    "configuration": "FlashFreq=80,UploadSpeed=921600",
+    "board": "esp32:esp32:nodemcu-32s",
+    "sketch": "ESP32_32S/ESP32_32S.ino"
+}
