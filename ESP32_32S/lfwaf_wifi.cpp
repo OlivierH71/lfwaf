@@ -39,7 +39,9 @@ byte lfwaf_wifi::connect(){
   WiFi.mode(WIFI_STA);
   // Ensure we don't try to og to Wifi while we are connecting it
   _log->unsetWifi();
-  _log->log(debug,"Connecting Wifi");
+  _log->log(debug,"Connecting Wifi... possible networks");
+  _log->log(debug,_settings->values.wifi_ssid[0]);
+  _log->log(debug,_settings->values.wifi_ssid[1]);
 
   // DEPENDING ON MODE: Either we scan and, if both available, takes the best values
   // Otherwise, start with the prefered and, if it fails, try the second one
@@ -98,7 +100,7 @@ byte lfwaf_wifi::connect(){
     }
     if (WiFi.status() == WL_CONNECTED){
       _log->log(info,"WiFi connected");
-      _log->log(info,"IP address: " + WiFi.localIP());
+      _log->log(info,"IP address: " + WiFi.localIP().toString());
     }
     else
       _log->log(error,"Wifi ''" + String(ssid) + "' was seen but connection failed.");

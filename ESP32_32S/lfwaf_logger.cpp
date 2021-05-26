@@ -25,14 +25,13 @@ void lfwaf_logger::log(logLevel lvl, String msg){
   if (isDebug || lvl != debug){
     char buf1[20];
     // DateTime now = rtc.now();
-    unsigned long myTime = millis();
+    double myTime = millis();
     sprintf(buf1, "%f",  myTime / 1000);
     sprintf(_buffer,"%d:%s:%s\n", lvl, buf1, msg.c_str());
     if (hasWifi){
       _server->announce(_buffer);
     }
-    else
-      Serial.print(String(_buffer));
+    Serial.print(String(_buffer));
   }
 }
 

@@ -23,7 +23,8 @@ void setup() {
 class cntBtn {
   typedef void (*callback_t)(cntBtn *btn, void *parent);
   public:
-    cntBtn(uint8_t pin);
+    cntBtn(uint8_t pin, void* parent);
+    void *_parent;
     ~cntBtn();
     uint8_t PIN;
     uint32_t  numberKeyPresses = 0;

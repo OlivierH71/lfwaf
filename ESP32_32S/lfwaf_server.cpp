@@ -10,27 +10,30 @@
 #include "lfwaf_helpers.h"
 #include "lfwaf_server.h"
 
-lfwaf_server::lfwaf_server(lfwaf_logger *log, lfwaf_settings *settings) : server(23) {
+lfwaf_server::lfwaf_server(lfwaf_logger *log, lfwaf_settings *settings) {
   _log = log;
   _settings = settings;
   //start server
   //WiFiServer server(23);
   _log->log(info,"Starting Wifi Server");
-  WiFi.begin();//"theNewOufBox","");
+  server.begin(23);
   // IMPORTANT: Avoid Nagle, ie, wait for enough data to transmit packet. We need immediate communication
-    server.setNoDelay(true);
+  server.setNoDelay(true);
   _log->log(info,"Ready! Use 'telnet' to connect");
   _log->setWifi(this);
 }
 
 void lfwaf_server::checkForClients(){
   if (server.hasClient()) {
+    _log->log(debug, "Incoming client");
     //find free/disconnected client
     int i;
     for (i = 0; i < MAX_SRV_CLIENTS; i++)
       if (!serverClients[i]) {
         serverClients[i] = server.available();
-        _log->log(info, String("New client #"+i).c_str());
+        _log->log(info, "New client #"+String(i+1));
+        // Flush buffer index
+        this->clientMsgsIdx[i] = 0;
         break;
       }
 
@@ -83,17 +86,18 @@ void lfwaf_server::parseCmd(char *cmd){
   _log->log(debug, "Parsing " + String(cmd));
   char leftCmd[64];
   char rightCmd[64];
-  sscanf(cmd, "%s=%s",leftCmd, rightCmd);
+  sscanf(cmd, "%s %s",leftCmd, rightCmd);
   if (leftCmd){
     UpperStr(leftCmd);
-    if (leftCmd == cmdSETFWNUM) changeFilterWNum(rightCmd);
-    else if (leftCmd == cmdSETFWNAME) changeFilterName(rightCmd);
-    else if (leftCmd == cmdSETFWSPEED) changeFilterWSpeed(rightCmd);
-    else if (leftCmd == cmdFOCUSER_IN) moveFocuser(0,rightCmd);
-    else if (leftCmd == cmdFOCUSER_OUT) moveFocuser(1,rightCmd);
-    else if (leftCmd == cmdSETHNAME) changeHostName(rightCmd);
-    else if (leftCmd == cmdSETWIFISSID) changeWifiSSID(rightCmd);
-    else if (leftCmd == cmdSETWIFIPREF) changeWifiPref(rightCmd);
+    if (!strcmp(leftCmd,cmdSETFWNUM)) changeFilterWNum(rightCmd);
+    else if (!strcmp(leftCmd , cmdSETFWNAME)) changeFilterName(rightCmd);
+    else if (!strcmp(leftCmd , cmdSETFWSPEED)) changeFilterWSpeed(rightCmd);
+    else if (!strcmp(leftCmd , cmdFOCUSER_IN)) moveFocuser(0,rightCmd);
+    else if (!strcmp(leftCmd , cmdFOCUSER_OUT)) moveFocuser(1,rightCmd);
+    else if (!strcmp(leftCmd , cmdSETHNAME)) changeHostName(rightCmd);
+    else if (!strcmp(leftCmd , cmdSETWIFISSID)) changeWifiSSID(rightCmd);
+    else if (!strcmp(leftCmd , cmdSETWIFIPREF)) changeWifiPref(rightCmd);
+    else _log->log(error, String(cmd) + ": Unknown command." );
   }
   else
     _log->log(error, String(cmd) + " is not well formated command." );
@@ -121,10 +125,10 @@ void lfwaf_server::processInputs(){
 void lfwaf_server::announce(char *message){
   int lenmsg = strlen(message);
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
-    if (serverClients[i].availableForWrite() >= lenmsg) {
-      size_t tcp_sent = serverClients[i].write(message, lenmsg);
+    if (this->serverClients[i].connected()) {
+      size_t tcp_sent = this->serverClients[i].write(message, lenmsg);
       if (tcp_sent != lenmsg) {
-        _log->log(error, "Error while sending message via Telnet" ); // : message len :%zd tcp-write:%zd\n", lenmsg, tcp_sent);
+        Serial.println("Error while sending message via Telnet" ); // : message len :%zd tcp-write:%zd\n", lenmsg, tcp_sent);
       }
     }
 }

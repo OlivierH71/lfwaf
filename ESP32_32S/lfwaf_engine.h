@@ -27,10 +27,6 @@
 #define CHANNEL_W 0
 #define CHANNEL_F 1
 
-int speedW = motorMinValue;
-int speedF = motorMinValue;
-int wheelMove = 0;
-
 /*************************************************************
   Manual Buttons Definitions
 *************************************************************/
@@ -43,12 +39,16 @@ int wheelMove = 0;
 
 class lfwaf_engine {
 public:
+    int speedW = motorMinValue;
+    int speedF = motorMinValue;
+    int wheelMove = 0;
     lfwaf_logger *_log;
+    lfwaf_settings *_settings;
     cntBtn *btnW_L,*btnW_R, *btnF_L, *btnF_R, *btnEOC_up, *btnEOC_dn;
     void focuserMove(boolean toUp);
     HW354 *motorWheel = new HW354(motW_L_pin, motW_R_pin, CHANNEL_W);
     HW354 *motorFocus = new HW354(motF_L_pin, motF_R_pin, CHANNEL_F);
-    lfwaf_engine(lfwaf_logger *log);
+    lfwaf_engine(lfwaf_logger *log, lfwaf_settings *settings);
 };
 
  /*  void btnPressedHandler(cntBtn *btn);

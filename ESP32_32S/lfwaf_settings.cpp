@@ -4,6 +4,7 @@
 */
 
 #include "Arduino.h"
+#include "EEPROM.h"
 #include "lfwaf_settings.h"
 #include "lfwaf_logger.h"
 #include "lfwaf_helpers.h"
@@ -12,6 +13,13 @@ lfwaf_settings::lfwaf_settings(lfwaf_logger *logger)
 {
     _log = logger;
     isvalid = load();
+    if (!isvalid){
+      _log->log(debug,"Setting default");
+      setWifi(1,"BB8","NOTRENOUVEAUWIFIESTLEPLUSFORT");
+      values.wifi_preference = wifi_pref_wifi1;
+      setFilterNum(1);
+      setFilterName(1,"default");
+    }
 }
 
 // Set one of the Wifi ssid and pwd
@@ -42,6 +50,7 @@ void lfwaf_settings::setFilterNames(int n, char **name){
   this->save();
 }
 
+/* Load Settings from EEPROM */
 bool lfwaf_settings::load()
 {
     _log->log(debug, "Loading settings from device EEPROM");
@@ -54,9 +63,11 @@ bool lfwaf_settings::load()
     return isValid;
 }
 
+/* Save Settings in EEPROM */
 void lfwaf_settings::save()
 {
-  strcpy("lfwafSet", this->values.key);
+  _log->log(debug, "Saving to device EEPROM.");
+  strcpy(this->values.key, "lfwafSet");
   EEPROM.put(0, this->values);
   _log->log(debug, "Settings saved in device EEPROM.");
 }

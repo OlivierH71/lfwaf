@@ -9,54 +9,9 @@
 #include "cntBtn.h"
 #include "HW-354.h"
 
-lfwaf_engine::lfwaf_engine(lfwaf_logger *log){
-    _log = log;
-
-  _log->log(debug, "Setting buttons");
-
-  // Create Buttons instances
-  btnW_L = new cntBtn(btnW_L_pin);
-  btnW_R = new cntBtn(btnW_R_pin);
-  btnF_L = new cntBtn(btnF_L_pin);
-  btnF_R = new cntBtn(btnF_R_pin);
-  btnEOC_up = new cntBtn(btnEOC_up_pin);
-  btnEOC_dn = new cntBtn(btnEOC_dn_pin);
-
-  // Set interupt handlers for each button
-  btnW_L->setOnPressed(btnPressedHandler);
-  btnW_R->setOnPressed(btnPressedHandler);
-  btnF_L->setOnPressed(btnPressedHandler);
-  btnF_R->setOnPressed(btnPressedHandler);
-  btnEOC_up->setOnPressed(btnPressedHandler);
-  btnEOC_dn->setOnPressed(btnPressedHandler);
-
-  btnF_L->setOnReleased(btnReleasedHandler);
-  btnF_R->setOnReleased(btnReleasedHandler);
-
-}
-
 /*************************************************************
-                          Methods
+                    Static Methods (GPIO handlers)
 *************************************************************/
-void lfwaf_engine::focuserMove(boolean toUp){
-  if (toUp){
-    if (digitalRead(btnEOC_up_pin)){
-      _log->log(info, "Moving focuser up");
-        motorFocus->startMotor(speedW);
-      }
-      else
-      _log->log(info, "Cannot move focuser up, End of Course reached");
-    }
-    else {
-      if (digitalRead(btnEOC_dn_pin)){
-      _log->log(info, "Moving focuser down");
-        motorFocus->startMotor(-speedW);
-        }
-      else
-      _log->log(info, "Cannot move focuser down, End of Course is reached");
-    }
-}
-
 // Handler for buttonPressed
 void btnPressedHandler(cntBtn *btn, void *parent){
   lfwaf_engine* eng = static_cast<lfwaf_engine*>(parent);
@@ -66,9 +21,9 @@ void btnPressedHandler(cntBtn *btn, void *parent){
     case btnEOC_up_pin: eng->motorFocus->stopMotor();break;
     case btnEOC_dn_pin: eng->motorFocus->stopMotor();break;
     // FilterWheel -
-    case btnW_L_pin: wheelMove--; break;
+    case btnW_L_pin: eng->wheelMove--; break;
     // FilterWheel +
-    case btnW_R_pin: wheelMove++; break;
+    case btnW_R_pin: eng->wheelMove++; break;
     // Move focuser up
     case btnF_L_pin: eng->focuserMove(true);break;
     // Move focuser down
@@ -87,3 +42,59 @@ void btnReleasedHandler(cntBtn *btn, void *parent){
     case btnF_R_pin: motorFocus.stopMotor();break;
   } */
 }
+
+/*************************************************************
+                    lfwaf_engine class
+*************************************************************/
+
+lfwaf_engine::lfwaf_engine(lfwaf_logger *log, lfwaf_settings *settings){
+  _log = log;
+  _settings = settings;
+
+  _log->log(debug, "Setting buttons");
+
+  // Create Buttons instances
+  btnW_L    = new cntBtn(btnW_L_pin, this);
+  btnW_R    = new cntBtn(btnW_R_pin, this);
+  btnF_L    = new cntBtn(btnF_L_pin, this);
+  btnF_R    = new cntBtn(btnF_R_pin, this);
+  btnEOC_up = new cntBtn(btnEOC_up_pin, this);
+  btnEOC_dn = new cntBtn(btnEOC_dn_pin, this);
+
+  // Set interupt handlers for pressing each button
+  btnW_L->setOnPressed(btnPressedHandler);
+  btnW_R->setOnPressed(btnPressedHandler);
+  btnF_L->setOnPressed(btnPressedHandler);
+  btnF_R->setOnPressed(btnPressedHandler);
+  btnEOC_up->setOnPressed(btnPressedHandler);
+  btnEOC_dn->setOnPressed(btnPressedHandler);
+
+  // Set interupt handlers for releasing focuser buttons
+  btnF_L->setOnReleased(btnReleasedHandler);
+  btnF_R->setOnReleased(btnReleasedHandler);
+
+}
+
+/*************************************************************
+                      Class Methods
+*************************************************************/
+void lfwaf_engine::focuserMove(boolean toUp){
+  if (toUp){
+    if (digitalRead(btnEOC_up_pin)){
+      //_log->log(info, "Moving focuser up");
+        motorFocus->startMotor(speedW);
+      }
+      else
+      _log->log(info, "Cannot move focuser up, end of Course reached");
+    }
+    else {
+      if (digitalRead(btnEOC_dn_pin)){
+      //_log->log(info, "Moving focuser down");
+        motorFocus->startMotor(-speedW);
+        }
+      else
+      _log->log(info, "Cannot move focuser down, end of Course is reached");
+    }
+}
+
+
