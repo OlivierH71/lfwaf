@@ -11,6 +11,8 @@
 #include <WiFi.h>
 #include "lfwaf_logger.h"
 #include "lfwaf_settings.h"
+#include "lfwaf_engine.h"
+
 ////////////////////////////////////////////////////////////
 
 //how many clients should be able to telnet to lwfaf? (one for indi and two for extern control)
@@ -20,7 +22,7 @@
 class lfwaf_server {
    // TCP_PORT);
 public:
-  lfwaf_server(lfwaf_logger *log, lfwaf_settings *settings);
+  lfwaf_server(lfwaf_logger *log, lfwaf_settings *settings, lfwaf_engine *engine);
   void checkForClients();
   void processInputs();
   void announce(char *message);    // Default behavior is to answer or announce any event all connected telnet clients
@@ -31,6 +33,7 @@ private:
   byte clientMsgsIdx[MAX_SRV_CLIENTS];
   lfwaf_logger *_log;
   lfwaf_settings *_settings;
+  lfwaf_engine *_engine;
   void parseCmd(char *cmd);
 
   void setWifi(int n, char* ssid, char* pwd);
@@ -40,7 +43,7 @@ private:
   void setFilterNum(byte Filter);
   void setFilterName(int n, char *name);
   void setFilterNames(int n, char **name);
-  void moveFocuser(byte dir, char *params);
+  void moveFocuser(bool up, char *params);
   void changeHostName(char *params);
   void changeWifiSSID(char *params);
   void changeWifiPref(char *params);

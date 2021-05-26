@@ -44,7 +44,7 @@ void setup()
   _log->log(info, "Engine started");
 
   _log->log(info, "Starting LFWAF Server");
-  _server = new lfwaf_server(_log, _settings);
+  _server = new lfwaf_server(_log, _settings, _engine);
   _log->log(info, "LFWAF server started");
 }
 void nop(){
@@ -56,12 +56,14 @@ void nop(){
 *************************************************************/
 void loop()
 {
-  // Button actions are directly managed by interrupt
-  // motors impulsions are driven by PWM
 
-    // Main loop is about server : We always lookup for new clients and process inputs
-    
+  // Main loop is about server and engine: We always lookup for new clients and process inputs
+
+  // Check for new client:
   _server->checkForClients();
+  // Check for Manual buttons
+  _engine->checkManualBtns();
+  // Check for remote commands
   _server->processInputs();
 
 }

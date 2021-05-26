@@ -9,10 +9,12 @@
 #include "lfwaf_settings.h"
 #include "lfwaf_helpers.h"
 #include "lfwaf_server.h"
+#include "lfwaf_engine.h"
 
-lfwaf_server::lfwaf_server(lfwaf_logger *log, lfwaf_settings *settings) {
+lfwaf_server::lfwaf_server(lfwaf_logger *log, lfwaf_settings *settings, lfwaf_engine *engine) {
   _log = log;
   _settings = settings;
+  _engine = engine;
   //start server
   //WiFiServer server(23);
   _log->log(info,"Starting Wifi Server");
@@ -66,8 +68,17 @@ void lfwaf_server::changeFilterWSpeed(char *params){
     _log->log(debug,"changeFilterWSpeed");
 }
 
-void lfwaf_server::moveFocuser(byte dir, char *params){
-    _log->log(debug,"moveFocuser");
+void lfwaf_server::moveFocuser(bool up, char *params){
+  _log->log(debug,"moveFocuser");
+  if (params){
+    int steps;
+    sscanf(params, "%d", &steps );
+    _engine->focuserMove(up);
+    delay(5*steps);
+    _engine->focuserStop();
+  }
+  else
+    _log->log(error,"Missing steps params");
 }
 
 void lfwaf_server::changeHostName(char *params){
@@ -92,8 +103,8 @@ void lfwaf_server::parseCmd(char *cmd){
     if (!strcmp(leftCmd,cmdSETFWNUM)) changeFilterWNum(rightCmd);
     else if (!strcmp(leftCmd , cmdSETFWNAME)) changeFilterName(rightCmd);
     else if (!strcmp(leftCmd , cmdSETFWSPEED)) changeFilterWSpeed(rightCmd);
-    else if (!strcmp(leftCmd , cmdFOCUSER_IN)) moveFocuser(0,rightCmd);
-    else if (!strcmp(leftCmd , cmdFOCUSER_OUT)) moveFocuser(1,rightCmd);
+    else if (!strcmp(leftCmd , cmdFOCUSER_IN)) moveFocuser(false,rightCmd);
+    else if (!strcmp(leftCmd , cmdFOCUSER_OUT)) moveFocuser(true,rightCmd);
     else if (!strcmp(leftCmd , cmdSETHNAME)) changeHostName(rightCmd);
     else if (!strcmp(leftCmd , cmdSETWIFISSID)) changeWifiSSID(rightCmd);
     else if (!strcmp(leftCmd , cmdSETWIFIPREF)) changeWifiPref(rightCmd);

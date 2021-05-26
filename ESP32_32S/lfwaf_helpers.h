@@ -21,4 +21,10 @@ static char * strtoupper( char * dest, const char * src ) {
     return result;
 }
 
+
+// isPressed is a simple function to return if a Pullup button is pressed (low level)
+static bool isPressed(uint8_t pin){
+  return (digitalRead(pin) == LOW);
+}
+
 #endif

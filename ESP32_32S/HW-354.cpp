@@ -4,7 +4,7 @@
 #define LEDC_TIMER_13_BIT  13
 
 // use 5000 Hz as a LEDC base frequency
-#define LEDC_BASE_FREQ     5000
+#define LEDC_BASE_FREQ     50
 
 void HW354::setParams(uint8_t pin1, uint8_t pin2, uint8_t channel, DecayMode decayMode, NumOfPwmPins numPins)
 {
@@ -39,12 +39,16 @@ int HW354::getPWM() {
 void HW354::stopMotor()
 {
     #if defined(ARDUINO_ARCH_ESP32)
-        ledcWrite(_channel1, LOW);
-        ledcWrite(_channel2, LOW);
+        //ledcWrite(_channel1, LOW);
+        //ledcWrite(_channel2, LOW);
+        analogWrite(_channel1, 0,1);
+        analogWrite(_channel2, 0,1);
+
     #else
         digitalWrite(_pin1, LOW);
         digitalWrite(_pin2, LOW);
     #endif
+    _pwmVal = 0;
 }
 
 // Arduino like analogWrite
@@ -58,51 +62,6 @@ void HW354::analogWrite(uint8_t channel, uint32_t value, uint32_t valueMax ) {
 
 void HW354::startMotor(long pwmSpeed) {
   _pwmVal = pwmSpeed;
-  // if set decay mode is set as fast decay mode
-  /*if (this->_whichMode == FAST_DECAY)
-  {
-    if (pwmSpeed >= 0)
-    {  //if Speed > 0 then forward fast decay
-      if(_numPwmPins == PWM_1PIN)
-        digitalWrite(_pin2, LOW);
-	    else
-	      analogWrite(_channel2, 1);
-        analogWrite(_channel1, pwmSpeed);
-    }
-    else
-      if (this->_numPwmPins == PWM_2PIN)
-      { // else reverse fast decay
-        pwmSpeed *= -1;
-  	     analogWrite(_channel1, 1);
-        analogWrite(_channel2, pwmSpeed);
-      }
-      else if (this->_numPwmPins == PWM_1PIN)
-      { // reverse slow decay
-      pwmSpeed *= -1;
-      digitalWrite(_pin2, HIGH);
-      analogWrite(_channel1, pwmSpeed);
-    }
-  }
-   // if decay mode is set as slow decay mode
-  else {
-    if (pwmSpeed >= 0) {                        // forward slow decay
-      if(_numPwmPins == PWM_1PIN)
-        digitalWrite(_pin1, HIGH);
-      else
-	      analogWrite(_channel1, LOW);
-      analogWrite(_channel2, pwmSpeed);
-    }
-    else if (this->_numPwmPins == PWM_2PIN) { // reverse slow decay
-      pwmSpeed *= -1;
-	    analogWrite(_channel2, 0);
-      analogWrite(_channel1, pwmSpeed);
-    }
-    else if (this->_numPwmPins == PWM_1PIN) { // reverse fast decay
-      pwmSpeed *= -1;
-      digitalWrite(_pin1, LOW);
-      analogWrite(_channel2, pwmSpeed);
-    }
-  }*/
   if (pwmSpeed >0){
       analogWrite(_channel2, 0,255);
       analogWrite(_channel1, pwmSpeed, 255);
