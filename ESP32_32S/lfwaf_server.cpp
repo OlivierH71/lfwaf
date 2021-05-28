@@ -58,6 +58,14 @@ void lfwaf_server::checkForClients(){
 
 void lfwaf_server::changeFilterWNum(char *params){
     _log->log(debug,"changeFilterWNum");
+  if (params){
+    int fNum;
+    sscanf(params, "%d", &fNum );
+    _engine->filterWheelMoveTo(fNum);
+  }
+  else
+    _log->log(error,"Missing filter Num param");
+
 }
 
 void lfwaf_server::changeFilterName(char *params){
@@ -78,7 +86,7 @@ void lfwaf_server::moveFocuser(bool up, char *params){
     _engine->focuserStop();
   }
   else
-    _log->log(error,"Missing steps params");
+    _log->log(error,"Missing steps param");
 }
 
 void lfwaf_server::changeHostName(char *params){

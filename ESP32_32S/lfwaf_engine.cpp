@@ -3,7 +3,7 @@
  *  Created By Deneb-l (olivier.hennebelle@gmail.com)
  *
 */
-#include <Ticker.h>   // We use Ticker rather than Timer. Ticker is easier to program
+#include <Ticker.h>
 #include "lfwaf_logger.h"
 #include "lfwaf_settings.h"
 // #include "cntBtn.h"
@@ -62,26 +62,6 @@ lfwaf_engine::lfwaf_engine(lfwaf_logger *log, lfwaf_settings *settings){
    pinMode(btnEOC_up_pin, INPUT_PULLUP);
    pinMode(btnEOC_dn_pin, INPUT_PULLUP);
 
-  // Create Buttons instances
-  /*btnW_L    = new cntBtn(btnW_L_pin, this);
-  btnW_R    = new cntBtn(btnW_R_pin, this);
-  btnF_L    = new cntBtn(btnF_L_pin, this);
-  btnF_R    = new cntBtn(btnF_R_pin, this);
-  btnEOC_up = new cntBtn(btnEOC_up_pin, this);
-  btnEOC_dn = new cntBtn(btnEOC_dn_pin, this); 
-
-  // Set interupt handlers for pressing each button
-  btnW_L->setOnPressed(btnPressedHandler);
-  btnW_R->setOnPressed(btnPressedHandler);
-  btnF_L->setOnPressed(btnPressedHandler);
-  btnF_R->setOnPressed(btnPressedHandler);
-  btnEOC_up->setOnPressed(btnPressedHandler);
-  btnEOC_dn->setOnPressed(btnPressedHandler);
-
-  // Set interupt handlers for releasing focuser buttons
-  btnF_L->setOnReleased(btnReleasedHandler);
-  btnF_R->setOnReleased(btnReleasedHandler); */
-
 }
 
 /*************************************************************
@@ -112,15 +92,46 @@ void lfwaf_engine::focuserStop(){
   motorFocus->stopMotor();
 }
 
-void lfwaf_engine::FilterWheelMove(int wheelMove){
-  // TBD
+void lfwaf_engine::filterWheelStop(){
+  motorWheel->stopMotor();
+}
+
+static void callbackWheelStop(lfwaf_engine *eng){
+  eng->filterWheelStop();
+}
+
+void lfwaf_engine::filterWheelMoveTo(int newFilter){
+    // direction depend on the nearest. eg, if we are on filter 5, and want to 
+    // go to filter 1, the nearest is to go up 1
+    // to go to filter 4, the nearest is to go down 1
+    s8_t direction = 1;
+    u8_t nbFilter = 0;
+    if (newFilter > currentFilter){
+      if ((newFilter - currentFilter) > 2) {
+        direction = -1;
+        nbFilter = currentFilter + (5-newFilter);
+      }
+      else
+        nbFilter = newFilter - currentFilter;    
+    }
+    else{
+            if ((newFilter - currentFilter) > 2) {
+        direction = -1;
+        nbFilter = currentFilter + (5-newFilter);
+      }
+      else
+        nbFilter = newFilter - currentFilter;    
+    }
+     // We use Ticker rather than Timer. Ticker is easier to program
+     motorWheel->startMotor(direction*speedW);
+     wheelMovedTicker.once_ms (2500*nbFilter, callbackWheelStop, this);
 }
 
 void lfwaf_engine::checkManualBtns(){
   if (isPressed(btnW_L_pin))
-    FilterWheelMove(--wheelMove);
+    filterWheelMoveTo(currentFilter > 1 ? currentFilter-1 : 5);
   if (isPressed(btnW_R_pin))
-    FilterWheelMove(++wheelMove);
+    filterWheelMoveTo(currentFilter < 4 ? currentFilter+1 : 1);
 
   // Focuser Up Button pushed ?
   if (isPressed(btnF_L_pin))
