@@ -21,5 +21,7 @@
 
 #define cmdFOCUSER_OUT "FOCUSER_OUT"    // Focuser Out       FOCUSER_OUT {number of ticks}
 
-#define cmdSETWIFISSID "SETWIFISSID"    // Set Wifi SSIDs and Pwds 
+#define cmdSTOPFOCUSER  "STOPFOCUS"     // Abort Focuser move
+
+#define cmdSETWIFISSID "SETWIFISSID"    // Set Wifi SSIDs and Pwds
 #define cmdSETWIFIPREF "SETWIFIPREF"    // Set Wifi selection preference
