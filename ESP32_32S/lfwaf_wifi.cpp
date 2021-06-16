@@ -51,7 +51,9 @@ byte lfwaf_wifi::connect(){
   RSSI[0] = RSSI[1] = -1000;
   for (int i = 0; i < n; ++i) {
     char SSID[32];
-    strtoupper(SSID, WiFi.SSID(i).c_str());
+    // strtoupper(SSID, WiFi.SSID(i).c_str());
+    strcpy(SSID, WiFi.SSID(i).c_str());
+    _log->log(debug,SSID);
     if (!strcmp(SSID, _settings->values.wifi_ssid[0])){
       RSSI[0] = WiFi.RSSI(0);
     }
@@ -90,6 +92,7 @@ byte lfwaf_wifi::connect(){
     const char *passwd = _settings->values.wifi_pass[ssidNum];
 
     _log->log(debug,"Selected wifi SSID for connection:" + String(ssid));
+    WiFi.setHostname(_settings->values.hostname);
     WiFi.begin(ssid, passwd);
     // Gives 10 seconds to try
     int i = 0;

@@ -124,7 +124,8 @@ void lfwaf_engine::filterWheelMoveTo(int newFilter){
     }
      // We use Ticker rather than Timer. Ticker is easier to program
      motorWheel->startMotor(direction*speedW);
-     wheelMovedTicker.once_ms (2500*nbFilter, callbackWheelStop, this);
+     //delayMicroseconds(2200);
+     wheelMovedTicker.once_ms (2200*nbFilter, callbackWheelStop, this);
 }
 
 void lfwaf_engine::checkManualBtns(){

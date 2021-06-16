@@ -18,15 +18,15 @@
 #ifndef lfwaf_settings_h
 #define lfwaf_settings_h
 
-#include <EEPROM.h>
+#include "EEPROM.h"
 // #include "lfwaf_logger.h"
 
 enum wifi_preference { wifi_pref_stronger, wifi_pref_wifi1, wifi_pref_wifi2};
 
 class lfwaf_logger;
-class lfwaf_settings{
-  struct Svalues {
+struct Svalues {
 	  char key[9]; // = "lfwafSet" + char[0]
+    char hostname[33];
 	  // Wifi settings
 	  char wifi_ssid[2][33];
 	  char wifi_pass[2][33];
@@ -39,12 +39,16 @@ class lfwaf_settings{
 	  byte  focuserPos;
 	  byte  focuserSpeed; // From 1 to 20...
   };
+class lfwaf_settings{
+  
   private:
+    EEPROMClass *EPSET;//("lfwaf_set", sizeof(Svalues));
     lfwaf_logger *_log;
     void setWifi(int n, char* ssid, char* pwd);
     void setFilterNum(byte Filter);
     void setFilterName(int n, char *name);
     void setFilterNames(int n, char **name);
+    void setHostName(char *hname);
   public:
     bool isvalid;
 	  Svalues values;

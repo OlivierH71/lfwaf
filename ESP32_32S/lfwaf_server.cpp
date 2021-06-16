@@ -10,6 +10,7 @@
 #include "lfwaf_helpers.h"
 #include "lfwaf_server.h"
 #include "lfwaf_engine.h"
+#include "lfwaf_protocol.h"
 
 lfwaf_server::lfwaf_server(lfwaf_logger *log, lfwaf_settings *settings, lfwaf_engine *engine) {
   _log = log;
@@ -21,10 +22,11 @@ lfwaf_server::lfwaf_server(lfwaf_logger *log, lfwaf_settings *settings, lfwaf_en
   server.begin(23);
   // IMPORTANT: Avoid Nagle, ie, wait for enough data to transmit packet. We need immediate communication
   server.setNoDelay(true);
-  _log->log(info,"Ready! Use 'telnet' to connect");
+  _log->log(info,"Ready! Use INDI or telnet (TCP23) to connect");
   _log->setWifi(this);
 }
 
+// Check for new client (for main loop)
 void lfwaf_server::checkForClients(){
   if (server.hasClient()) {
     _log->log(debug, "Incoming client");
@@ -33,7 +35,7 @@ void lfwaf_server::checkForClients(){
     for (i = 0; i < MAX_SRV_CLIENTS; i++)
       if (!serverClients[i]) {
         serverClients[i] = server.available();
-        _log->log(info, "New client #"+String(i+1));
+        _log->log(info, "Ack-lfwaf"+String(i+1));
         // Flush buffer index
         this->clientMsgsIdx[i] = 0;
         break;
@@ -47,15 +49,7 @@ void lfwaf_server::checkForClients(){
   }
 }
 
-#define cmdSETFWNUM "SETFWNUM"
-#define cmdSETFWNAME "SETFWNAME"
-#define cmdSETFWSPEED "SETFWSPEED"
-#define cmdFOCUSER_IN "FOCUSER_IN"
-#define cmdFOCUSER_OUT "FOCUSER_OUT"
-#define cmdSETHNAME "SETHNAME"
-#define cmdSETWIFISSID "SETWIFISSID"
-#define cmdSETWIFIPREF "SETWIFIPREF"
-
+// Moave the filter wheel to filter position
 void lfwaf_server::changeFilterWNum(char *params){
     _log->log(debug,"changeFilterWNum");
   if (params){
@@ -65,7 +59,6 @@ void lfwaf_server::changeFilterWNum(char *params){
   }
   else
     _log->log(error,"Missing filter Num param");
-
 }
 
 void lfwaf_server::changeFilterName(char *params){
@@ -91,29 +84,39 @@ void lfwaf_server::moveFocuser(bool up, char *params){
 
 void lfwaf_server::changeHostName(char *params){
     _log->log(debug,"changeHostName");
+    sscanf(params ,"%s", _settings->values.hostname);
+    strcpy(_settings->values.hostname, params);
+    _settings->save();
 }
 
 void lfwaf_server::changeWifiSSID(char *params){
     _log->log(debug,"changeWifiSSID");
+    sscanf(params, "%s|%s|%s|%s", _settings->values.wifi_ssid[0],
+                                  _settings->values.wifi_pass[0],
+                                  _settings->values.wifi_ssid[1],
+                                  _settings->values.wifi_pass[1]);
+    _settings->save();
+    _log->log(info,"OK");
 }
 
 void lfwaf_server::changeWifiPref(char *params){
     _log->log(debug,"changeWifiPref");
+    sscanf(params, "%d", &_settings->values.wifi_preference);
 }
 
 void lfwaf_server::parseCmd(char *cmd){
   _log->log(debug, "Parsing " + String(cmd));
   char leftCmd[64];
-  char rightCmd[64];
+  char rightCmd[257];
   sscanf(cmd, "%s %s",leftCmd, rightCmd);
   if (leftCmd){
     UpperStr(leftCmd);
-    if (!strcmp(leftCmd,cmdSETFWNUM)) changeFilterWNum(rightCmd);
-    else if (!strcmp(leftCmd , cmdSETFWNAME)) changeFilterName(rightCmd);
-    else if (!strcmp(leftCmd , cmdSETFWSPEED)) changeFilterWSpeed(rightCmd);
-    else if (!strcmp(leftCmd , cmdFOCUSER_IN)) moveFocuser(false,rightCmd);
+    if (!strcmp(leftCmd,cmdGOTOFNUM))           changeFilterWNum(rightCmd);
+    else if (!strcmp(leftCmd , cmdSETFNAME))    changeFilterName(rightCmd);
+    else if (!strcmp(leftCmd , cmdSETFWSPEED))  changeFilterWSpeed(rightCmd);
+    else if (!strcmp(leftCmd , cmdFOCUSER_IN))  moveFocuser(false,rightCmd);
     else if (!strcmp(leftCmd , cmdFOCUSER_OUT)) moveFocuser(true,rightCmd);
-    else if (!strcmp(leftCmd , cmdSETHNAME)) changeHostName(rightCmd);
+    else if (!strcmp(leftCmd , cmdSETHNAME))    changeHostName(rightCmd);
     else if (!strcmp(leftCmd , cmdSETWIFISSID)) changeWifiSSID(rightCmd);
     else if (!strcmp(leftCmd , cmdSETWIFIPREF)) changeWifiPref(rightCmd);
     else _log->log(error, String(cmd) + ": Unknown command." );
@@ -141,7 +144,7 @@ void lfwaf_server::processInputs(){
 }
 
 // Most important method of class: sends a message to all clients
-void lfwaf_server::announce(char *message){
+void lfwaf_server::announce(char *message) {
   int lenmsg = strlen(message);
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
     if (this->serverClients[i].connected()) {

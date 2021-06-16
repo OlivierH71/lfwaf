@@ -25,9 +25,11 @@ void lfwaf_logger::log(logLevel lvl, String msg){
   if (isDebug || lvl != debug){
     char buf1[20];
     // DateTime now = rtc.now();
-    double myTime = millis();
-    sprintf(buf1, "%f",  myTime / 1000);
-    sprintf(_buffer,"%d:%s:%s\n", lvl, buf1, msg.c_str());
+    // double myTime = millis();
+    // sprintf(buf1, "%f",  myTime / 1000);
+    // sprintf(_buffer,"%d:%s:%s\n", lvl, buf1, msg.c_str());
+
+    sprintf(_buffer,"%d:%s\n", lvl, msg.c_str());
     if (hasWifi){
       _server->announce(_buffer);
     }
