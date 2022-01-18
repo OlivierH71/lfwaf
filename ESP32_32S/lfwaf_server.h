@@ -9,6 +9,7 @@
 
 #include <WiFiClient.h>
 #include <WiFi.h>
+#include <Ticker.h>
 #include "lfwaf_logger.h"
 #include "lfwaf_settings.h"
 #include "lfwaf_engine.h"
@@ -31,22 +32,44 @@ private:
   WiFiClient serverClients[MAX_SRV_CLIENTS];
   char clientMsgs[MAX_SRV_CLIENTS][64];
   byte clientMsgsIdx[MAX_SRV_CLIENTS];
+  char serialMsg[64];
+  byte serialMsgIdx = 0;
+
   lfwaf_logger *_log;
   lfwaf_settings *_settings;
   lfwaf_engine *_engine;
+
   void parseCmd(char *cmd);
 
+  void acknowledge();
   void setWifi(int n, char* ssid, char* pwd);
-  void changeFilterWNum(char *params);
-  void changeFilterName(char *params);
-  void changeFilterWSpeed(char *params);
+  void setFilterName(char *params);
+  void setFilterWSpeed(char *params);
   void setFilterNum(byte Filter);
-  void setFilterName(int n, char *name);
+  void getFilterName(char *params);
   void setFilterNames(int n, char **name);
+  void setFocuserSpeed(char *params);
+  void getFocuserSpeed(char *params);
+
+  bool focuserMoving = false;
   void moveFocuser(bool up, char *params);
-  void changeHostName(char *params);
-  void changeWifiSSID(char *params);
-  void changeWifiPref(char *params);
+  Ticker focuserMoveTicker;
+  static void focuserTickerStop();
+  bool isFocuserMoving();
+  void stopFocuser();
+
+  bool filterWMoving = false;
+  void changeFilterWNum(char *params);
+  Ticker filterWMoveTicker;
+  static void filterWTickerStop();
+  bool isfilterWMoving();
+
+  void setHostName(char *params);
+  void getHostName(char *params);
+  void setWifiSSID(char *params);
+  void getWifiSSID(char *params);
+  void setWifiPref(char *params);
+  void getWifiPref(char *params);
 };
 
 #endif

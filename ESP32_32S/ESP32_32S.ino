@@ -3,9 +3,9 @@
   This project relies on many classes:
 
   lfwaf_logger    logger class: it sends messages on different level to serial com' and Wifi link when connected
-  lfwaf_settings  class relyng on EEPROM. Stores settings locally in the MicroController (incl Wifi setting, speed and btns/motors IO pins)
+  lfwaf_settings  class relying on EEPROM. Stores settings locally in the MicroController (incl Wifi setting, speed and btns/motors IO pins)
   lfwaf_wifi      class based on Wifi class. Scans and connect to wifi.
-  lfwaf_server    Action Server: handles queries sent to lfwaf. Basically, could receive instructions from Wifi, serial or BLE and tells engine to operate
+  lfwaf_server    Action Server: handles queries sent to lfwaf. In Theory, could receive instructions from Wifi, serial or BLE and tells engine to operate
   lfwaf_engine    Hardware Engine: Manage buttons and motors actions
 */
 
@@ -16,11 +16,11 @@
 #include "lfwaf_server.h"
 #include "lfwaf_engine.h"
 
-lfwaf_logger    *_log;
-lfwaf_settings  *_settings;
-lfwaf_wifi      *_wifi;
-lfwaf_server    *_server;
-lfwaf_engine    *_engine;
+lfwaf_logger *_log;
+lfwaf_settings *_settings;
+lfwaf_wifi *_wifi;
+lfwaf_server *_server;
+lfwaf_engine *_engine;
 
 /*************************************************************
                         ARDUINO SETUP
@@ -47,8 +47,8 @@ void setup()
   _server = new lfwaf_server(_log, _settings, _engine);
   _log->log(info, "LFWAF server started");
 }
-void nop(){
-  
+void nop()
+{
 }
 
 /*************************************************************
@@ -65,5 +65,4 @@ void loop()
   _engine->checkManualBtns();
   // Check for remote commands
   _server->processInputs();
-
 }

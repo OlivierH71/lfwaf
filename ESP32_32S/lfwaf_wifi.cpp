@@ -91,7 +91,7 @@ byte lfwaf_wifi::connect(){
     const char *ssid = _settings->values.wifi_ssid[ssidNum];
     const char *passwd = _settings->values.wifi_pass[ssidNum];
 
-    _log->log(debug,"Selected wifi SSID for connection:" + String(ssid));
+    _log->log(debug,"Selected wifi SSID for connection:" + String(ssid) + "/" + String(passwd));
     WiFi.setHostname(_settings->values.hostname);
     WiFi.begin(ssid, passwd);
     // Gives 10 seconds to try
@@ -106,7 +106,7 @@ byte lfwaf_wifi::connect(){
       _log->log(info,"IP address: " + WiFi.localIP().toString());
     }
     else
-      _log->log(error,"Wifi ''" + String(ssid) + "' was seen but connection failed.");
+      _log->log(error,"Wifi '" + String(ssid) + "' was seen but connection failed.");
   }
   else
     _log->log(error,"No wifi candidate could be seen in area (are you too far?)");

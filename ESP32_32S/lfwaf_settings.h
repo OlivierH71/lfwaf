@@ -34,9 +34,10 @@ struct Svalues {
 	  // FilterWheel Settings
     char FilterNames[10][33];
 	  byte FilterNum;
-	  int fwSpeed;
+	  byte fwSpeed;
 	  // focuser Settings
-	  byte  focuserPos;
+	  int  focuserPos;
+    int  maxPos;
 	  byte  focuserSpeed; // From 1 to 20...
   };
 class lfwaf_settings{
