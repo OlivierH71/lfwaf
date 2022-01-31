@@ -117,6 +117,7 @@ void lfwaf_server::focuserTickerStop(){
     ZeServer->focuserMoveTicker.detach();
     ZeServer->_engine->focuserStop();
     ZeServer->focuserMoving = false;
+    ZeServer->_log->log(info, "OK");
 }
 
 bool lfwaf_server::isFocuserMoving(){

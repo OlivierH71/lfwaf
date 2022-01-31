@@ -62,7 +62,7 @@ void loop()
   // Check for new client:
   _server->checkForClients();
   // Check for Manual buttons
-  _engine->checkManualBtns();
+  //_engine->checkManualBtns();
   // Check for remote commands
   _server->processInputs();
 }
