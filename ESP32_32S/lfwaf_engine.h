@@ -13,7 +13,7 @@
 #include "lfwaf_settings.h"
 // #include "cntBtn.h"
 #include "HW-354.h"
-
+#include "DirectMotor.h""
 
 /*************************************************************
   Motor Definitions
@@ -55,6 +55,7 @@ public:
     void checkManualBtns();
     HW354 *motorWheel = new HW354(motW_L_pin, motW_R_pin, CHANNEL_W);
     HW354 *motorFocus = new HW354(motF_L_pin, motF_R_pin, CHANNEL_F);
+    //DirectMotor *motorFocus = new DirectMotor(motF_L_pin, motF_R_pin, CHANNEL_F);
     lfwaf_engine(lfwaf_logger *log, lfwaf_settings *settings);
 private:
     bool focuser_moving = false;

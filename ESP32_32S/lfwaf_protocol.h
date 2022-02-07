@@ -30,10 +30,10 @@
 #define cmdSETWIFIPREF  "SETWIFIPREF"       //* Set Wifi selection preference
 #define cmdGETWIFIPREF  "GETWIFIPREF"       //* gets Wifi selection preference
 
-#define cmdGETFOMAXPOS  "GETFOMAXPOS"     //- gets the device max position capability
-#define cmdSETFOMAXPOS  "SETFOMAXPOS"     //- sets the device max position capability
+#define cmdGETFOMAXPOS  "GETFOMAXPOS"       //- gets the device max position capability
+#define cmdSETFOMAXPOS  "SETFOMAXPOS"       //- sets the device max position capability
 
-#define cmdGETFOCUSPOS  "GETFOCUSPOS"     //- gets device current position
-#define cmdSETFOCUSPOS  "SETFOCUSPOS"     //- sets device current position
+#define cmdGETFOCUSPOS  "GETFOCUSPOS"       //- gets device current position
+#define cmdSETFOCUSPOS  "SETFOCUSPOS"       //- sets device current position
 
-#define cmdACKNOWLEDGE  "ACKNOWLEDGE\n"       // Start communication
+#define cmdACKNOWLEDGE  "ACKNOWLEDGE\n"     // Start communication
