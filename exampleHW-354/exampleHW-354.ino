@@ -28,5 +28,5 @@ void loop() {
     increment = -increment;
   }
   // wait for 30 milliseconds to see the dimming effect
-  delay(30);
+  delay(100);
 }

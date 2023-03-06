@@ -1,4 +1,4 @@
-#include <LiquidCrystal.h>
+// #include <LiquidCrystal.h>
 
 /*
   lfwaf_logger.cpp - Library for managinf lfwaf wifi
